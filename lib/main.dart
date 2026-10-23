@@ -656,7 +656,9 @@ class _WatchAppState extends State<WatchApp> with WidgetsBindingObserver {
   }
 
   Widget _buildShellHome() {
-    final onboarded = _onboardedOverride ?? isOnboarded();
+    // NOVAPLAY FORK: no onboarding — the app ships with his catalog as the
+    // source, so there is no repository setup to explain on first launch.
+    final onboarded = true;
     return onboarded
         ? ProfileLaunchGate(child: RootShell())
         : OnboardingScreen(

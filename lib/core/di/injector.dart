@@ -829,6 +829,17 @@ Future<void> initDependencies() async {
   // legacy `bundled://` entries left by older installs, then load the
   // repo-installed providers persisted from previous launches.
   await registry.purgeBundled();
+
+  // NOVAPLAY FORK: seed the bundled NovaPlay provider (his private catalog)
+  // as the app's source. Runs after purgeBundled so the purge cannot drop
+  // it; installFromBundled loads it into the runtime immediately, and
+  // loadAll below re-loads it from the in-memory bundled cache.
+  final novaJs = await rootBundle.loadString('providers/nova.js');
+  await registry.installFromBundled(
+    name: 'nova',
+    jsSource: novaJs,
+    displayName: 'NovaPlay',
+  );
   // Load repo-installed JS providers into the runtime. Bounded so a provider
   // whose JS HANGS (flutter_js can deadlock) can't trap the splash — the
   // reported "stuck on the splash for minutes":
@@ -1040,6 +1051,8 @@ Future<void> initDependencies() async {
   sl.registerSingleton<ActiveSourceCubit>(
     ActiveSourceCubit(
       box: Hive.box(ActiveSourceCubit.boxName),
+      // NOVAPLAY FORK: fresh installs start on his catalog source.
+      fallback: 'nova',
       // Valid ids = JS providers + LNReader novel sources (both load on the
       // boot path — lnrManager.installedSources is synchronous). CloudStream,
       // Aniyomi and Mihon load off the boot path, so a saved `cs:`/`ani:`/

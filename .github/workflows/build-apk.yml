@@ -1,7 +1,7 @@
 name: Build APK
 
-# Manual trigger for now: proves the fork builds end-to-end on GitHub's
-# runners (Flutter/Gradle cannot run in the local sandbox).
+# Manual build for the NovaPlay fork: Actions tab -> Build APK -> Run workflow.
+# Produces the arm64 release APK as a downloadable artifact.
 on:
   workflow_dispatch:
 
@@ -11,25 +11,44 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v4
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
         with:
           distribution: zulu
-          java-version: "17"
+          java-version: '17'
 
-      - uses: subosito/flutter-action@v2
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
         with:
           channel: stable
           cache: true
 
+      # The repo carries a placeholder where the catalog app key belongs
+      # (the repo is public; the key is a build secret). Inject it into the
+      # bundled provider before building, and fail loudly if it is missing.
+      - name: Inject NovaPlay catalog key
+        env:
+          NOVAPLAY_APP_KEY: ${{ secrets.NOVAPLAY_APP_KEY }}
+        run: |
+          if [ -z "$NOVAPLAY_APP_KEY" ]; then
+            echo "::error::NOVAPLAY_APP_KEY secret is not set"
+            exit 1
+          fi
+          sed -i "s/__NOVAPLAY_APP_KEY__/$NOVAPLAY_APP_KEY/" providers/nova.js
+          if grep -q "__NOVAPLAY_APP_KEY__" providers/nova.js; then
+            echo "::error::catalog key placeholder still present after injection"
+            exit 1
+          fi
+
       - name: Fetch dependencies
         run: flutter pub get
 
-      - name: Build release APK
-        run: flutter build apk --release
+      - name: Build release APKs (split per ABI)
+        run: flutter build apk --release --split-per-abi
 
-      - name: Upload APK
+      - name: Upload arm64 APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-release-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          name: novaplay-arm64-apk
+          path: build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
           if-no-files-found: error

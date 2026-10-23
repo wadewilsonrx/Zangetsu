@@ -16,7 +16,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 2.3.3+19604
+version: 1.0.0+1
 
 environment:
   sdk: ^3.11.5
@@ -280,6 +280,10 @@ flutter:
     - extractors/mp4upload.js
     - extractors/streamlare.js
     - extractors/doodstream.js
+    # NovaPlay fork: his private catalog provider, seeded at boot from this
+    # bundled asset (providers/nova.js). The catalog app key is injected by
+    # CI before the build — the file in this repo carries a placeholder.
+    - providers/nova.js
     # Cheerio + htmlparser2 bundle for LNReader-style novel source scripts.
     - assets/js/lnreader_cheerio.js
     # require()/fetch shims + plugin loader that runs LNReader plugins on top.
