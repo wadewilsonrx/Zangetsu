@@ -16,11 +16,8 @@ class AppwriteService {
 
   /// Null when there is no restorable Appwrite session.
   Future<String?> mintJwt() async {
-    try {
-      final jwt = await _account.createJWT();
-      return jwt.jwt;
-    } catch (_) {
-      return null;
-    }
+    // NOVAPLAY FORK: account migration does not exist in this build — never
+    // contact the upstream Appwrite project.
+    return null;
   }
 }

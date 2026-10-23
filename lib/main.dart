@@ -134,15 +134,21 @@ Future<void> main() async {
       // boot always proceeds; cloud features degrade to local-only until the next
       // launch on a live network (SupabaseService.currentUserId tolerates an
       // uninitialized client).
-      var supabaseOk = false;
+      // NOVAPLAY FORK: no cloud accounts in this build — Environment ships
+      // blank Supabase values, initialization is skipped entirely, and every
+      // store runs local-only (a fully supported upstream mode). supabaseOk
+      // starts true so the background retry loop never starts either.
+      var supabaseOk = Environment.supabaseUrl.isEmpty;
       try {
-        await Supabase.initialize(
-          url: Environment.supabaseUrl,
-          anonKey: Environment.supabaseAnonKey,
-          // TV auth uses QR pairing, not OAuth redirect deep links.
-          authOptions: FlutterAuthClientOptions(detectSessionInUri: !appleTv),
-        ).timeout(const Duration(seconds: 8));
-        supabaseOk = true;
+        if (!supabaseOk) {
+          await Supabase.initialize(
+            url: Environment.supabaseUrl,
+            anonKey: Environment.supabaseAnonKey,
+            // TV auth uses QR pairing, not OAuth redirect deep links.
+            authOptions: FlutterAuthClientOptions(detectSessionInUri: !appleTv),
+          ).timeout(const Duration(seconds: 8));
+          supabaseOk = true;
+        }
       } catch (e, st) {
         AppLogger.instance.logError(e, st);
       }

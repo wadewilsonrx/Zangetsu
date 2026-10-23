@@ -43,6 +43,27 @@ jobs:
       - name: Fetch dependencies
         run: flutter pub get
 
+      # Release signing with the owner's own keystore (same key as his other
+      # apps), so builds install over each other as updates instead of
+      # failing on a signature mismatch. Secrets never touch the repo:
+      # key.properties and the .jks are created here, in the runner only.
+      - name: Set up release signing
+        env:
+          KEYSTORE_BASE64: ${{ secrets.NOVAPLAY_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.NOVAPLAY_KEYSTORE_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ] || [ -z "$KEYSTORE_PASSWORD" ]; then
+            echo "::error::signing secrets are not set"
+            exit 1
+          fi
+          echo "$KEYSTORE_BASE64" | base64 -d > android/app/novaplay-release.jks
+          cat > android/key.properties <<EOF
+          storePassword=$KEYSTORE_PASSWORD
+          keyPassword=$KEYSTORE_PASSWORD
+          keyAlias=tgplay
+          storeFile=novaplay-release.jks
+          EOF
+
       - name: Build release APKs (split per ABI)
         run: flutter build apk --release --split-per-abi
 

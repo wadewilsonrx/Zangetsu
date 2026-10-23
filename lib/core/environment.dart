@@ -10,30 +10,35 @@ class Environment {
   // Supabase project URL + anon (public) key — safe to embed, same as the
   // Appwrite project id/endpoint above. Override with --dart-define if a
   // build needs a different project (e.g. staging).
+  // NOVAPLAY FORK: no cloud backend — blank defaults keep Supabase
+  // uninitialized; main.dart skips initialization when the URL is empty
+  // and every store runs local-only.
   static const String supabaseUrl = String.fromEnvironment(
     'SUPABASE_URL',
-    defaultValue: 'https://eogwzrlfoercfwcfwlmv.supabase.co',
+    defaultValue: '',
   );
   static const String supabaseAnonKey = String.fromEnvironment(
     'SUPABASE_ANON_KEY',
-    defaultValue:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVvZ3d6cmxmb2VyY2Z3Y2Z3bG12Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQzNjgzODIsImV4cCI6MjA5OTk0NDM4Mn0.qr-nHnB9vb7BodP55XJ9-6Rwp__eOGCS6txhLiuWVZw',
+    defaultValue: '',
   );
 
-  // Supabase issues auth tokens; all app cloud-data sync uses the VPS.
+  // NOVAPLAY FORK: the sync client is constructed but never queried while
+  // signed out; the default points at the owner's own Worker purely because
+  // the boot validator requires a valid HTTPS URL — no upstream endpoint.
   static const String vpsSyncUrl = String.fromEnvironment(
     'VPS_SYNC_URL',
-    defaultValue: 'https://sync.zangetsu.online',
+    defaultValue: 'https://nova-catalog.oshadakalindu.workers.dev',
   );
 
   /// Where Appwrite sends the password-recovery link. Appwrite appends
   /// Password-reset landing. Supabase now drives reset (via the auth `site_url`,
   /// which points at this same page); kept for reference. Not used by the
   /// Supabase AuthCubit, which calls `resetPasswordForEmail`.
-  static const String passwordResetUrl = 'https://zangetsu.online/';
+  static const String passwordResetUrl = '';
 
   /// Base of the Zangetsu website (landing + reset + the share "open" page).
-  static const String siteBaseUrl = 'https://zangetsu.online';
+  // NOVAPLAY FORK: no upstream website — blank.
+  static const String siteBaseUrl = '';
 
   /// Share links point here. The page opens the app if installed (via the
   /// [openLinkScheme] scheme below), otherwise offers the download. Its domain

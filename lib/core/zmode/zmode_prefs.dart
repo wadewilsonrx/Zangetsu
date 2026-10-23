@@ -39,14 +39,14 @@ class ZModePrefs {
   static Box? get _boxOrNull =>
       Hive.isBoxOpen(boxName) ? Hive.box(boxName) : null;
 
-  /// On for everyone. The metadata catalogue is how the app browses now, and
-  /// the Settings toggle that used to turn it off is gone.
+  /// Upstream this is on for everyone (the metadata catalogue is how the
+  /// app browses there, and no Settings toggle can turn it off). The
+  /// source-only path still exists underneath.
   ///
-  /// The stored key is still read by [setEnabled] so tests can exercise the
-  /// source-only path, which still exists underneath — but nothing in the UI
-  /// can reach it, so a fresh install and an upgrade both land here.
-  static bool get enabled =>
-      (_boxOrNull?.get(_kEnabled, defaultValue: true) as bool?) ?? true;
+  /// NOVAPLAY FORK: always off. Home is source-backed only — his catalog
+  /// provider is the entire app. The metadata catalogue (AniList / TMDB /
+  /// Simkl browsing rows) never engages in this build.
+  static bool get enabled => false;
 
   static Future<void> setEnabled(bool value) async {
     if (value == enabled) return;

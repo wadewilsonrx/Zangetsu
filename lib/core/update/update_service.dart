@@ -60,35 +60,9 @@ class UpdateService {
   /// version the user chose to skip). Returns null on no-update or any error —
   /// callers must treat null as "nothing to do" (never throws).
   Future<UpdateInfo?> checkForUpdate({bool respectSkip = false}) async {
-    try {
-      final beta = await betaOptIn();
-      final release =
-          beta ? await _newestBetaRelease() : await _latestStableRelease();
-      if (release == null) return null;
-
-      final rawTag = ((release['tag_name'] as String?) ?? '').trim();
-      if (rawTag.isEmpty) return null;
-      final version = rawTag.startsWith('v') ? rawTag.substring(1) : rawTag;
-
-      final pkg = await PackageInfo.fromPlatform();
-      if (compareVersions(version, pkg.version) <= 0) return null;
-      if (respectSkip && await _skippedVersion() == version) return null;
-
-      final apk = _pickApk(
-          (release['assets'] as List?) ?? const [], await _deviceAbis());
-      if (apk == null) return null;
-
-      return UpdateInfo(
-        version: version,
-        notes: ((release['body'] as String?) ?? '').trim(),
-        apkUrl: apk.$2,
-        assetName: apk.$1,
-        apkSize: apk.$3,
-        isPrerelease: release['prerelease'] == true,
-      );
-    } catch (_) {
-      return null;
-    }
+    // NOVAPLAY FORK: updates arrive as fresh builds from the owner — the app
+    // never checks the upstream repository for new versions.
+    return null;
   }
 
   /// Latest **stable** release — GitHub's /releases/latest excludes

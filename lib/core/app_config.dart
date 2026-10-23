@@ -1,7 +1,7 @@
 /// Single source of truth for the product name. Final rename = one
 /// find/replace on the token `WATCH_APP` across the repo, plus a bundle-id
 /// rename (`flutter pub run rename` or manual android/ios edits).
-const String kAppName = 'Zangetsu';
+const String kAppName = 'NovaPlay';
 
 /// Running app version shown in Settings/About. Populated from the real build
 /// (PackageInfo) at boot so it never goes stale; this literal is just the
@@ -25,7 +25,8 @@ const int kManifestSchemaVersion = 2;
 /// Community Discord invite. Lived in two places (the launch community sheet
 /// and Settings → About) and drifted — the sheet's copy went stale and expired.
 /// One const now, so refreshing the invite is a single edit here.
-const String kDiscordInviteUrl = 'https://discord.gg/hey6vz9kg6';
+// NOVAPLAY FORK: no community server — blank.
+const String kDiscordInviteUrl = '';
 
 /// Where "Send report" posts the diagnostic log — the Cloudflare Worker in
 /// `cloudflare/log-intake/` (see its README to deploy). No path, no trailing
@@ -37,18 +38,20 @@ const String kDiscordInviteUrl = 'https://discord.gg/hey6vz9kg6';
 /// Only the public URL lives here. The Discord webhook stays on the Worker:
 /// this app is open source and its APK is public, so anything put in the app
 /// can be read straight back out of it.
-const String kLogIntakeUrl = 'https://zangetsu-logs.log-intake.workers.dev';
+// NOVAPLAY FORK: no log-intake Worker — blank (report falls back to share).
+const String kLogIntakeUrl = '';
 
 /// Public R2 manifest for the rotating profile-picker backdrops. The manifest
 /// contains up to three image filenames stored beside it in this bucket.
-const String kProfilePickerArtworkManifestUrl =
-    'https://pub-a8b67f6edb404cb1b7545e19bc2b5b94.r2.dev/profile-picker/manifest.json';
+// NOVAPLAY FORK: no upstream artwork bucket — blank.
+const String kProfilePickerArtworkManifestUrl = '';
 
 /// Developer announcements feed (a plain JSON file in the public app repo).
 /// The app READS this on launch to show in-app announcements — never writes.
 /// Edit + push that file to broadcast a message to every user.
-const String kAnnouncementsUrl =
-    'https://raw.githubusercontent.com/Spyou/Zangetsu/main/announcements.json';
+// NOVAPLAY FORK: no developer announcements feed — blank (the service is
+// fail-safe and treats any fetch error as "nothing new").
+const String kAnnouncementsUrl = '';
 
 /// TMDB API key for movie/TV trailer lookups (TrailerService). Anime trailers
 /// use AniList and need no key. Supply via `--dart-define=TMDB_API_KEY=...`,
